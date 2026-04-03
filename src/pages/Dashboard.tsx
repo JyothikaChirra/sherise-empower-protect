@@ -8,6 +8,7 @@ import JobsSection from "@/components/sections/JobsSection";
 import SkillsSection from "@/components/sections/SkillsSection";
 import StayFinderSection from "@/components/sections/StayFinderSection";
 import ChatbotSection from "@/components/sections/ChatbotSection";
+import MyApplications from "@/components/sections/MyApplications";
 
 interface DashboardProps {
   onLogout: () => void;
@@ -18,6 +19,7 @@ const sections = [
   { id: "Harassment Detection", component: HarassmentSection },
   { id: "Scholarships", component: ScholarshipsSection },
   { id: "Jobs", component: JobsSection },
+  { id: "My Applications", component: MyApplications },
   { id: "Skills", component: SkillsSection },
   { id: "Stay Finder", component: StayFinderSection },
   { id: "AI Assistant", component: ChatbotSection },
