@@ -1,31 +1,40 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail, Lock, User, Shield } from "lucide-react";
-import { loginUser } from "@/lib/auth";
+import { signIn, signUp } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
 
-interface AuthProps {
-  onAuth: () => void;
-}
-
-const Auth = ({ onAuth }: AuthProps) => {
+const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    loginUser(email, password, isLogin ? undefined : name);
-    onAuth();
+    setLoading(true);
+    try {
+      if (isLogin) {
+        await signIn(email, password);
+      } else {
+        await signUp(email, password, name);
+        toast({ title: "Account created!", description: "Check your email to confirm your account." });
+      }
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 gradient-bg relative overflow-hidden">
-      {/* Decorative blobs */}
       <div className="absolute top-20 left-10 w-72 h-72 rounded-full opacity-30 blur-3xl gradient-primary" />
       <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full opacity-20 blur-3xl bg-accent" />
 
@@ -36,7 +45,6 @@ const Auth = ({ onAuth }: AuthProps) => {
         className="w-full max-w-md"
       >
         <div className="glass-card rounded-3xl p-8 relative z-10">
-          {/* Logo */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 mb-4">
               <Shield className="w-8 h-8 text-primary" />
@@ -48,7 +56,6 @@ const Auth = ({ onAuth }: AuthProps) => {
             </p>
           </div>
 
-          {/* Toggle */}
           <div className="flex rounded-xl bg-muted p-1 mb-6">
             <button
               onClick={() => setIsLogin(true)}
@@ -105,6 +112,7 @@ const Auth = ({ onAuth }: AuthProps) => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="pl-10 pr-10 bg-muted/50 border-border/50"
                 required
+                minLength={6}
               />
               <button
                 type="button"
@@ -127,8 +135,12 @@ const Auth = ({ onAuth }: AuthProps) => {
               </div>
             )}
 
-            <Button type="submit" className="w-full gradient-primary text-primary-foreground hover:opacity-90 transition-opacity">
-              {isLogin ? "Login" : "Create Account"}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full gradient-primary text-primary-foreground hover:opacity-90 transition-opacity"
+            >
+              {loading ? "Please wait..." : isLogin ? "Login" : "Create Account"}
             </Button>
           </form>
 

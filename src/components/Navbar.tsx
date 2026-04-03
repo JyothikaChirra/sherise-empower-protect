@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Shield, Menu, X, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { logoutUser } from "@/lib/auth";
+import { signOut } from "@/lib/auth";
 
 const navItems = [
   "Safety", "Harassment Detection", "Scholarships", "Jobs", "Skills", "Stay Finder", "AI Assistant",
@@ -16,8 +16,8 @@ interface NavbarProps {
 const Navbar = ({ onLogout, activeSection, onNavigate }: NavbarProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const handleLogout = () => {
-    logoutUser();
+  const handleLogout = async () => {
+    await signOut();
     onLogout();
   };
 
@@ -29,7 +29,6 @@ const Navbar = ({ onLogout, activeSection, onNavigate }: NavbarProps) => {
           <span className="text-xl font-bold font-display gradient-text">SheRise</span>
         </div>
 
-        {/* Desktop nav */}
         <div className="hidden lg:flex items-center gap-1">
           {navItems.map((item) => (
             <button
@@ -56,7 +55,6 @@ const Navbar = ({ onLogout, activeSection, onNavigate }: NavbarProps) => {
         </div>
       </div>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
