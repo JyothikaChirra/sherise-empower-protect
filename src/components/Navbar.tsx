@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { signOut } from "@/lib/auth";
 
 const navItems = [
-  "Safety", "Harassment Detection", "Scholarships", "Jobs", "Skills", "Stay Finder", "AI Assistant",
+  "Safety", "Harassment Detection", "Scholarships", "Jobs", "My Applications", "Skills", "Stay Finder", "AI Assistant",
 ];
 
 interface NavbarProps {
