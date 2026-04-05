@@ -140,29 +140,16 @@ const SkillsSection = () => {
                 </button>
               </div>
 
-              {/* Video Player */}
-              {playingVideo && (
-                <div className="mb-6 rounded-2xl overflow-hidden aspect-video">
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    src={`https://www.youtube.com/embed/${playingVideo}?autoplay=1`}
-                    title="Video player"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full h-full"
-                  />
-                </div>
-              )}
+              {/* Video Player - opens in new tab */}
 
               {/* Video List */}
               <div className="space-y-3">
                 {selectedSkill.videos.map((video, idx) => (
                   <button
                     key={video.id}
-                    onClick={() => setPlayingVideo(video.id)}
+                    onClick={() => window.open(`https://www.youtube.com/watch?v=${video.id}`, "_blank")}
                     className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all text-left ${
-                      playingVideo === video.id
+                      false
                         ? "bg-primary/10 border border-primary/30"
                         : "hover:bg-muted/60 border border-transparent"
                     }`}
