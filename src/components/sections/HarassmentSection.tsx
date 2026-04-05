@@ -1,18 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ShieldAlert, Upload, MessageSquare, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import { ShieldAlert, Upload, MessageSquare, CheckCircle, XCircle, AlertTriangle, Loader2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-
-const offensiveWords = ["hate", "ugly", "stupid", "dumb", "kill", "die", "slut", "whore", "bitch", "trash", "idiot"];
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 type Result = "safe" | "offensive" | "highly_offensive" | null;
 
 const HarassmentSection = () => {
+  const { toast } = useToast();
   const [text, setText] = useState("");
   const [result, setResult] = useState<Result>(null);
-  const [complaintSent, setComplaintSent] = useState(false);
+  const [complaintText, setComplaintText] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [reports, setReports] = useState<any[]>([]);
+  const [uploading, setUploading] = useState(false);
+
+  const offensiveWords = ["hate", "ugly", "stupid", "dumb", "kill", "die", "slut", "whore", "bitch", "trash", "idiot", "abuse", "threat", "harass"];
+
+  useEffect(() => {
+    loadReports();
+  }, []);
+
+  const loadReports = async () => {
+    const { data } = await supabase
+      .from("harassment_reports")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(10);
+    if (data) setReports(data);
+  };
 
   const analyzeText = () => {
     const lower = text.toLowerCase();
@@ -20,6 +40,59 @@ const HarassmentSection = () => {
     if (matchCount >= 2) setResult("highly_offensive");
     else if (matchCount === 1) setResult("offensive");
     else setResult("safe");
+  };
+
+  const handleSubmitReport = async () => {
+    if (!complaintText.trim()) return;
+    setSubmitting(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      let screenshotUrl: string | null = null;
+
+      // Upload screenshot if provided
+      if (file) {
+        setUploading(true);
+        const fileExt = file.name.split(".").pop();
+        const filePath = `${user.id}/${Date.now()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from("evidence")
+          .upload(filePath, file);
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage.from("evidence").getPublicUrl(filePath);
+        screenshotUrl = urlData.publicUrl;
+        setUploading(false);
+      }
+
+      const { error } = await supabase.from("harassment_reports").insert({
+        user_id: user.id,
+        description: complaintText,
+        screenshot_url: screenshotUrl,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "✅ Report Submitted",
+        description: "Your anonymous complaint has been recorded securely.",
+      });
+
+      setComplaintText("");
+      setFile(null);
+      loadReports();
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message || "Failed to submit report",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+      setUploading(false);
+    }
   };
 
   const resultConfig = {
@@ -69,7 +142,7 @@ const HarassmentSection = () => {
               <div>
                 <p className={`font-semibold ${resultConfig[result].color}`}>{resultConfig[result].label}</p>
                 <p className="text-xs text-muted-foreground">
-                  {result === "safe" ? "No harmful content detected." : "This content may be harmful."}
+                  {result === "safe" ? "No harmful content detected." : "This content may be harmful. Consider reporting it."}
                 </p>
               </div>
             </motion.div>
@@ -81,10 +154,16 @@ const HarassmentSection = () => {
           <div className="section-card">
             <div className="flex items-center gap-2 mb-3">
               <Upload className="w-5 h-5 text-primary" />
-              <h3 className="font-semibold font-display">Upload Screenshot</h3>
+              <h3 className="font-semibold font-display">Upload Evidence</h3>
             </div>
-            <p className="text-sm text-muted-foreground mb-3">Upload screenshots of harassment for evidence.</p>
-            <Input type="file" accept="image/*" className="bg-muted/30" />
+            <p className="text-sm text-muted-foreground mb-3">Upload screenshots of harassment as evidence.</p>
+            <Input
+              type="file"
+              accept="image/*"
+              className="bg-muted/30"
+              onChange={(e) => setFile(e.target.files?.[0] || null)}
+            />
+            {file && <p className="text-xs text-muted-foreground mt-1">📎 {file.name}</p>}
           </div>
 
           <div className="section-card">
@@ -92,26 +171,52 @@ const HarassmentSection = () => {
               <MessageSquare className="w-5 h-5 text-primary" />
               <h3 className="font-semibold font-display">Anonymous Complaint</h3>
             </div>
-            {complaintSent ? (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-4">
-                <CheckCircle className="w-10 h-10 text-green-600 mx-auto mb-2" />
-                <p className="font-medium text-green-700">Complaint submitted anonymously!</p>
-              </motion.div>
-            ) : (
-              <div className="space-y-3">
-                <Textarea placeholder="Describe the incident..." className="bg-muted/30 min-h-[80px]" />
-                <Button
-                  variant="outline"
-                  className="border-primary/30 text-foreground hover:bg-primary/10"
-                  onClick={() => setComplaintSent(true)}
-                >
-                  Submit Anonymously
-                </Button>
-              </div>
-            )}
+            <div className="space-y-3">
+              <Textarea
+                placeholder="Describe the incident..."
+                className="bg-muted/30 min-h-[80px]"
+                value={complaintText}
+                onChange={(e) => setComplaintText(e.target.value)}
+              />
+              <Button
+                variant="outline"
+                className="border-primary/30 text-foreground hover:bg-primary/10"
+                onClick={handleSubmitReport}
+                disabled={submitting || !complaintText.trim()}
+              >
+                {submitting ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Submitting...</> : "Submit Anonymously"}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Previous Reports */}
+      {reports.length > 0 && (
+        <div>
+          <h3 className="text-xl font-semibold font-display mb-4">Your Reports</h3>
+          <div className="space-y-3">
+            {reports.map((report) => (
+              <div key={report.id} className="section-card flex items-start gap-3">
+                <FileText className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm line-clamp-2">{report.description}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                      report.status === "submitted" ? "bg-amber-100 text-amber-700" :
+                      report.status === "reviewed" ? "bg-blue-100 text-blue-700" :
+                      "bg-green-100 text-green-700"
+                    }`}>{report.status}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(report.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
