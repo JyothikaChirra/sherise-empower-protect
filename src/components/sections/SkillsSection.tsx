@@ -147,9 +147,9 @@ const SkillsSection = () => {
                 {selectedSkill.videos.map((video, idx) => (
                   <button
                     key={video.id}
-                    onClick={() => setPlayingVideo(video.id)}
+                    onClick={() => window.open(`https://www.youtube.com/watch?v=${video.id}`, "_blank")}
                     className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all text-left ${
-                      playingVideo === video.id
+                      false
                         ? "bg-primary/10 border border-primary/30"
                         : "hover:bg-muted/60 border border-transparent"
                     }`}
