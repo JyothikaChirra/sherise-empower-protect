@@ -74,7 +74,6 @@ const skills = [
 
 const SkillsSection = () => {
   const [selectedSkill, setSelectedSkill] = useState<typeof skills[0] | null>(null);
-  const [playingVideo, setPlayingVideo] = useState<string | null>(null);
 
   return (
     <div className="space-y-8">
@@ -116,7 +115,7 @@ const SkillsSection = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/60 p-4"
-            onClick={() => { setSelectedSkill(null); setPlayingVideo(null); }}
+            onClick={() => setSelectedSkill(null)}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -133,7 +132,7 @@ const SkillsSection = () => {
                   <h3 className="text-xl font-bold font-display">{selectedSkill.title}</h3>
                 </div>
                 <button
-                  onClick={() => { setSelectedSkill(null); setPlayingVideo(null); }}
+                  onClick={() => setSelectedSkill(null)}
                   className="p-2 rounded-xl hover:bg-muted/60 text-muted-foreground"
                 >
                   <X className="w-5 h-5" />
@@ -145,9 +144,11 @@ const SkillsSection = () => {
               {/* Video List */}
               <div className="space-y-3">
                 {selectedSkill.videos.map((video, idx) => (
-                  <button
+                  <a
                     key={video.id}
-                    onClick={() => window.open(`https://www.youtube.com/watch?v=${video.id}`, "_blank")}
+                    href={`https://youtu.be/${video.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all text-left ${
                       false
                         ? "bg-primary/10 border border-primary/30"
@@ -170,17 +171,23 @@ const SkillsSection = () => {
                       <p className="font-medium text-sm">{video.title}</p>
                       <p className="text-xs text-muted-foreground">Lesson {idx + 1}</p>
                     </div>
-                  </button>
+                  </a>
                 ))}
               </div>
 
               <div className="mt-4 pt-4 border-t border-border/50">
                 <Button
+                  asChild
                   variant="outline"
                   className="w-full border-primary/30 text-foreground hover:bg-primary/10"
-                  onClick={() => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(selectedSkill.title + " tutorial for women")}`, "_blank")}
                 >
-                  Find More Videos on YouTube
+                  <a
+                    href={`https://www.youtube.com/results?search_query=${encodeURIComponent(selectedSkill.title + " tutorial for women")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Find More Videos on YouTube
+                  </a>
                 </Button>
               </div>
             </motion.div>
