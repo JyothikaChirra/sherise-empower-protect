@@ -10,9 +10,9 @@ const skills = [
     icon: Scissors,
     color: "from-pink-500 to-rose-400",
     videos: [
-      { title: "Basic Hand Stitching for Beginners", id: "kFz0wnRMNsQ" },
-      { title: "How to Use a Sewing Machine", id: "UStFSAqXKCA" },
-      { title: "Learn Embroidery Basics", id: "OKjTK7ePXaA" },
+      { title: "How to Hand Sew an Invisible Stitch", id: "WbE5hXt27uU" },
+      { title: "Beginners Sewing Course - The Basics", id: "IGITrkYdjJs" },
+      { title: "Basic Embroidery Techniques", id: "4tboUqTV41U" },
     ],
   },
   {
@@ -21,9 +21,9 @@ const skills = [
     icon: ChefHat,
     color: "from-orange-400 to-amber-400",
     videos: [
-      { title: "Indian Cooking Basics", id: "EYjKfMIqR_Q" },
-      { title: "Easy Healthy Recipes", id: "41KjVVYpPWQ" },
-      { title: "South Indian Breakfast Recipes", id: "ZX7gJPalTNY" },
+      { title: "Beginner's Guide to Spices for Indian Cooking", id: "FztdLxp01WA" },
+      { title: "How I Cook 20 Healthy Meals in 1 Hour", id: "LzWb_P4lYgA" },
+      { title: "Healthy Meal Prep That Actually Tastes Good", id: "n8dAvpqE0M4" },
     ],
   },
   {
@@ -32,9 +32,9 @@ const skills = [
     icon: Sparkles,
     color: "from-purple-500 to-violet-400",
     videos: [
-      { title: "Complete Makeup Tutorial for Beginners", id: "Tn43JLWvcpM" },
-      { title: "Skincare Routine Guide", id: "OrElyY7MFVs" },
-      { title: "Professional Hair Styling Tutorial", id: "1JKK3Yqp-EQ" },
+      { title: "10 Minute Makeup Tutorial for Beginners", id: "6kFhFMB-DQg" },
+      { title: "Natural Everyday Makeup Tutorial", id: "5vSHFSFRdx8" },
+      { title: "Easy Hairstyles for Beginners", id: "CIwzw1BgSaQ" },
     ],
   },
   {
@@ -43,9 +43,9 @@ const skills = [
     icon: Music,
     color: "from-cyan-500 to-blue-400",
     videos: [
-      { title: "Bollywood Dance Steps for Beginners", id: "ZCr_FO5MxMY" },
-      { title: "Learn Singing Basics", id: "3lTn4p_oWKw" },
-      { title: "Classical Dance Tutorial", id: "XFvHvkPcJvI" },
+      { title: "12 Basic Bollywood Dance Moves", id: "ZC0zn5KRsfI" },
+      { title: "Beginner Bollywood Dance Moves", id: "SsGtNa3Oo3Y" },
+      { title: "Beginner Singing Lessons", id: "WH_OV7yEDf4" },
     ],
   },
   {
@@ -54,9 +54,9 @@ const skills = [
     icon: Languages,
     color: "from-emerald-500 to-green-400",
     videos: [
-      { title: "Spoken English for Beginners", id: "DSVnf9FXSBE" },
-      { title: "Daily English Conversations", id: "juKd-AxKfEI" },
-      { title: "Improve English Fluency", id: "MghB8bg6GU4" },
+      { title: "English Speaking Practice", id: "BbEE2XYUoRk" },
+      { title: "Everyday English Conversation Practice", id: "henIVlCPVIY" },
+      { title: "Improve English Speaking Fluency", id: "vHBrMxIEEwY" },
     ],
   },
   {
@@ -65,9 +65,9 @@ const skills = [
     icon: Monitor,
     color: "from-indigo-500 to-blue-400",
     videos: [
-      { title: "Computer Basics for Beginners", id: "RDlejVMGBCM" },
-      { title: "MS Excel Complete Tutorial", id: "Vl0H-qTclOg" },
-      { title: "Learn MS Word in Hindi", id: "2z0YFLnWKJQ" },
+      { title: "Computer Basics for Absolute Beginners", id: "y2kg3MOk1sY" },
+      { title: "Excel Full Course Tutorial", id: "rro5t8eHXaY" },
+      { title: "Microsoft Word Tutorial for Beginners", id: "5Im87VPQZ_0" },
     ],
   },
 ];
@@ -75,6 +75,16 @@ const skills = [
 const SkillsSection = () => {
   const [selectedSkill, setSelectedSkill] = useState<typeof skills[0] | null>(null);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
+
+  const openSkill = (skill: typeof skills[0]) => {
+    setSelectedSkill(skill);
+    setPlayingVideo(skill.videos[0]?.id ?? null);
+  };
+
+  const closeSkill = () => {
+    setSelectedSkill(null);
+    setPlayingVideo(null);
+  };
 
   return (
     <div className="space-y-8">
@@ -91,7 +101,7 @@ const SkillsSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08 }}
             className="section-card group cursor-pointer"
-            onClick={() => { setSelectedSkill(skill); setPlayingVideo(null); }}
+            onClick={() => openSkill(skill)}
           >
             <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${skill.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
               <skill.icon className="w-7 h-7 text-primary-foreground" />
@@ -108,7 +118,6 @@ const SkillsSection = () => {
         ))}
       </div>
 
-      {/* Video Modal */}
       <AnimatePresence>
         {selectedSkill && (
           <motion.div
@@ -116,7 +125,7 @@ const SkillsSection = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/60 p-4"
-            onClick={() => { setSelectedSkill(null); setPlayingVideo(null); }}
+            onClick={closeSkill}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -133,27 +142,36 @@ const SkillsSection = () => {
                   <h3 className="text-xl font-bold font-display">{selectedSkill.title}</h3>
                 </div>
                 <button
-                  onClick={() => { setSelectedSkill(null); setPlayingVideo(null); }}
+                  onClick={closeSkill}
                   className="p-2 rounded-xl hover:bg-muted/60 text-muted-foreground"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Embedded YouTube Player */}
               {playingVideo && (
-                <div className="mb-6 rounded-2xl overflow-hidden bg-black aspect-video">
-                  <iframe
-                    src={`https://www.youtube-nocookie.com/embed/${playingVideo}?autoplay=1&rel=0`}
-                    title="YouTube video player"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                    className="w-full h-full border-0"
-                  />
+                <div className="mb-6 space-y-3">
+                  <div className="rounded-2xl overflow-hidden bg-black aspect-video">
+                    <iframe
+                      src={`https://www.youtube-nocookie.com/embed/${playingVideo}?autoplay=1&rel=0&modestbranding=1`}
+                      title="YouTube video player"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      className="w-full h-full border-0"
+                    />
+                  </div>
+                  <Button asChild variant="outline" className="w-full border-primary/30 text-foreground hover:bg-primary/10">
+                    <a
+                      href={`https://www.youtube.com/watch?v=${playingVideo}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Open this video on YouTube
+                    </a>
+                  </Button>
                 </div>
               )}
 
-              {/* Video List */}
               <div className="space-y-3">
                 {selectedSkill.videos.map((video, idx) => (
                   <button
@@ -169,6 +187,7 @@ const SkillsSection = () => {
                       <img
                         src={`https://img.youtube.com/vi/${video.id}/mqdefault.jpg`}
                         alt={video.title}
+                        loading="lazy"
                         className="w-28 h-16 rounded-lg object-cover"
                       />
                       <div className="absolute inset-0 flex items-center justify-center">
