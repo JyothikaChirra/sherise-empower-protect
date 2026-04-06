@@ -74,6 +74,7 @@ const skills = [
 
 const SkillsSection = () => {
   const [selectedSkill, setSelectedSkill] = useState<typeof skills[0] | null>(null);
+  const [playingVideo, setPlayingVideo] = useState<string | null>(null);
 
   return (
     <div className="space-y-8">
@@ -90,7 +91,7 @@ const SkillsSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08 }}
             className="section-card group cursor-pointer"
-            onClick={() => setSelectedSkill(skill)}
+            onClick={() => { setSelectedSkill(skill); setPlayingVideo(null); }}
           >
             <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${skill.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
               <skill.icon className="w-7 h-7 text-primary-foreground" />
@@ -115,13 +116,13 @@ const SkillsSection = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/60 p-4"
-            onClick={() => setSelectedSkill(null)}
+            onClick={() => { setSelectedSkill(null); setPlayingVideo(null); }}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="glass-card rounded-3xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              className="glass-card rounded-3xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-6">
@@ -132,25 +133,34 @@ const SkillsSection = () => {
                   <h3 className="text-xl font-bold font-display">{selectedSkill.title}</h3>
                 </div>
                 <button
-                  onClick={() => setSelectedSkill(null)}
+                  onClick={() => { setSelectedSkill(null); setPlayingVideo(null); }}
                   className="p-2 rounded-xl hover:bg-muted/60 text-muted-foreground"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Video Player - opens in new tab */}
+              {/* Embedded YouTube Player */}
+              {playingVideo && (
+                <div className="mb-6 rounded-2xl overflow-hidden bg-black aspect-video">
+                  <iframe
+                    src={`https://www.youtube-nocookie.com/embed/${playingVideo}?autoplay=1&rel=0`}
+                    title="YouTube video player"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    className="w-full h-full border-0"
+                  />
+                </div>
+              )}
 
               {/* Video List */}
               <div className="space-y-3">
                 {selectedSkill.videos.map((video, idx) => (
-                  <a
+                  <button
                     key={video.id}
-                    href={`https://youtu.be/${video.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    onClick={() => setPlayingVideo(video.id)}
                     className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all text-left ${
-                      false
+                      playingVideo === video.id
                         ? "bg-primary/10 border border-primary/30"
                         : "hover:bg-muted/60 border border-transparent"
                     }`}
@@ -171,7 +181,7 @@ const SkillsSection = () => {
                       <p className="font-medium text-sm">{video.title}</p>
                       <p className="text-xs text-muted-foreground">Lesson {idx + 1}</p>
                     </div>
-                  </a>
+                  </button>
                 ))}
               </div>
 
