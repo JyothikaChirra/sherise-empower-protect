@@ -165,6 +165,7 @@ const SkillsSection = () => {
                       href={`https://www.youtube.com/watch?v=${playingVideo}`}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       Open this video on YouTube
                     </a>
@@ -214,6 +215,7 @@ const SkillsSection = () => {
                     href={`https://www.youtube.com/results?search_query=${encodeURIComponent(selectedSkill.title + " tutorial for women")}`}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     Find More Videos on YouTube
                   </a>
