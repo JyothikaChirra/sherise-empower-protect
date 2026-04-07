@@ -206,20 +206,6 @@ const SkillsSection = () => {
               </div>
 
               <div className="mt-4 pt-4 border-t border-border/50">
-                <Button
-                  asChild
-                  variant="outline"
-                  className="w-full border-primary/30 text-foreground hover:bg-primary/10"
-                >
-                  <a
-                    href={`https://www.youtube.com/results?search_query=${encodeURIComponent(selectedSkill.title + " tutorial for women")}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    Find More Videos on YouTube
-                  </a>
-                </Button>
               </div>
             </motion.div>
           </motion.div>
