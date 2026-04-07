@@ -1,22 +1,16 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Home, MapPin, ShieldCheck, Star } from "lucide-react";
+import { Home, MapPin, ShieldCheck, Star, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-const stays = [
-  { name: "Sakhi Women's PG", location: "Koramangala, Bangalore", price: 4500, rating: 4.5, safe: true, amenities: ["WiFi", "AC", "Security"] },
-  { name: "RoseNest Hostel", location: "Andheri, Mumbai", price: 3500, rating: 4.2, safe: true, amenities: ["WiFi", "Meals", "CCTV"] },
-  { name: "GraceLiving PG", location: "Sector 62, Noida", price: 2500, rating: 4.0, safe: true, amenities: ["WiFi", "Laundry"] },
-  { name: "ShePod Co-living", location: "Hinjewadi, Pune", price: 6000, rating: 4.8, safe: true, amenities: ["WiFi", "AC", "Gym", "Security"] },
-  { name: "LilyPad Hostel", location: "Salt Lake, Kolkata", price: 1800, rating: 3.9, safe: true, amenities: ["Meals", "CCTV"] },
-  { name: "NestHer PG", location: "Madhapur, Hyderabad", price: 5500, rating: 4.6, safe: true, amenities: ["WiFi", "AC", "Meals", "Security"] },
-];
+import { stays } from "@/data/stays";
 
 const priceFilters = ["All", "Below ₹2000", "Below ₹3000", "Below ₹5000", "Below ₹10000"];
 
 const StayFinderSection = () => {
   const [priceFilter, setPriceFilter] = useState("All");
+  const navigate = useNavigate();
 
   const getMaxPrice = (filter: string) => {
     if (filter === "Below ₹2000") return 2000;
@@ -52,36 +46,47 @@ const StayFinderSection = () => {
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((stay, i) => (
           <motion.div
-            key={stay.name}
+            key={stay.id}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08 }}
-            className="section-card"
+            className="section-card overflow-hidden group cursor-pointer"
+            onClick={() => navigate(`/stay/${stay.id}`)}
           >
-            <div className="flex items-start justify-between mb-3">
-              <Home className="w-8 h-8 text-primary" />
-              {stay.safe && (
-                <Badge className="gradient-primary text-primary-foreground gap-1 text-xs">
+            {/* Thumbnail */}
+            <div className="relative -mx-4 -mt-4 mb-3 h-40 overflow-hidden">
+              <img
+                src={stay.images[0]}
+                alt={stay.name}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              {stay.safetyFeatures.includes("Women-Only") && (
+                <Badge className="absolute top-2 right-2 gradient-primary text-primary-foreground gap-1 text-xs">
                   <ShieldCheck className="w-3 h-3" /> Safe
                 </Badge>
               )}
             </div>
+
             <h3 className="font-semibold mb-1">{stay.name}</h3>
             <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
-              <MapPin className="w-3 h-3" /> {stay.location}
+              <MapPin className="w-3 h-3" /> {stay.address.split(",").slice(0, 2).join(",")}
             </div>
             <div className="flex items-center gap-1 mb-3">
               <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
               <span className="text-sm font-medium">{stay.rating}</span>
             </div>
             <div className="flex flex-wrap gap-1 mb-3">
-              {stay.amenities.map((a) => (
+              {stay.amenities.slice(0, 4).map((a) => (
                 <Badge key={a} variant="outline" className="text-xs border-primary/20">{a}</Badge>
               ))}
             </div>
             <div className="flex items-center justify-between">
               <p className="text-primary font-bold text-lg">₹{stay.price.toLocaleString()}<span className="text-xs text-muted-foreground font-normal">/mo</span></p>
-              <Button size="sm" variant="outline" className="border-primary/30 text-foreground hover:bg-primary/10">View</Button>
+              <Button size="sm" className="gradient-primary text-primary-foreground gap-1">
+                <Eye className="w-3.5 h-3.5" /> View
+              </Button>
             </div>
           </motion.div>
         ))}
