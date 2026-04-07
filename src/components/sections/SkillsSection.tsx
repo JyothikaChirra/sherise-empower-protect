@@ -160,16 +160,6 @@ const SkillsSection = () => {
                       className="w-full h-full border-0"
                     />
                   </div>
-                  <Button asChild variant="outline" className="w-full border-primary/30 text-foreground hover:bg-primary/10">
-                    <a
-                      href={`https://www.youtube.com/watch?v=${playingVideo}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      Open this video on YouTube
-                    </a>
-                  </Button>
                 </div>
               )}
 
