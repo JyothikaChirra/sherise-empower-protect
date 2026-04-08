@@ -5,7 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const LOVABLE_API_URL = "https://dhareredolztxlppztxy.supabase.co/functions/v1/ai-proxy"
+const LOVABLE_API_URL = "https://ai.gateway.lovable.dev/v1/chat/completions"
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
